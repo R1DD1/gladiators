@@ -35,17 +35,18 @@ public class Commands implements CommandExecutor {
     int gameProcess;
     int punishmentOfGods;
     int timer;
-    int newZ = 10;
+    int newZ;
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         timer = 125;
+        newZ = 10;
+
         Player p = (Player) sender;
         if (command.getName().equalsIgnoreCase("startGlad")){
             for (Player ps : Bukkit.getOnlinePlayers()){
                 onlinePlayers.add(ps);
                 ps.teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), -10, 30, newZ));
             }
-
             gameProcess = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
                 @Override
                 public void run() {
@@ -69,7 +70,6 @@ public class Commands implements CommandExecutor {
                         punishmentOfGods = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
                             @Override
                             public void run() {
-
                                 for (Player p : Bukkit.getOnlinePlayers()){
                                     p.setHealth(p.getHealth()-1);
                                 }
@@ -82,22 +82,23 @@ public class Commands implements CommandExecutor {
                     }
                 }
             },20,20);
-//            int playerAmount = onlinePlayers.size();
-//
-//            if (playerAmount%4==0){
-//                playersInLine = playerAmount/4;
-//            }else {
-//                int remains = playerAmount%4;
-//                playersInLine = playerAmount/4;
-//                playersInLine = playersInLine+1;
-//            }
-//
-//            for (int i =0; i<=playersInLine; i++){
-//
-//                onlinePlayers.get(i).teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), -10, 30, newZ));
-//                newZ = newZ -5;
-//
-//            }
+            int playerAmount = onlinePlayers.size();
+
+            if (playerAmount%4==0){
+                playersInLine = playerAmount/4;
+            }else {
+                int remains = playerAmount%4;
+                playersInLine = playerAmount/4;
+                playersInLine = playersInLine+1;
+            }
+
+            for (int i =0; i<=playersInLine; i++){
+
+                onlinePlayers.get(i).teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), -10, 30, newZ));
+                onlinePlayers.get(i+4).teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), 10, 30, newZ));
+                newZ = newZ -5;
+
+            }
         }
         return true;
     }
