@@ -9,7 +9,7 @@ public final class Gladiators extends JavaPlugin {
     @Override
     public void onEnable() {
         getServer().getPluginManager().registerEvents(new GladiatorsMechanic(this), this);
-        getCommand("startGlad").setExecutor(new Commands(this));
+        getCommand("start").setExecutor(new Commands(this));
 
         WorldCreator gladiatorsWorld = new WorldCreator("GladiatorsWorld");
         gladiatorsWorld.type(WorldType.FLAT);

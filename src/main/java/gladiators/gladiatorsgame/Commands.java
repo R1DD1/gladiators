@@ -16,88 +16,51 @@ import java.util.List;
 public class Commands implements CommandExecutor {
 
     private final Gladiators plugin;
-    List<Player> onlinePlayers = new ArrayList<Player>();
-    int playersInLine;
 
     public Commands(Gladiators plugin) {
         this.plugin = plugin;
     }
 
-    public int randomInt(int arg0){
-        int i = (int) (Math.random() * arg0);
-        return i;
+    boolean gameIsOn = false;
+
+    public boolean isGameIsOn() {
+        return gameIsOn;
     }
 
-    public void spawnPlayers(){
-
+    public void setGameIsOn(boolean gameIsOn) {
+        this.gameIsOn = gameIsOn;
     }
 
-    int gameProcess;
-    int punishmentOfGods;
-    int timer;
-    int newZ;
+    List<Player> onlinePlayers = new ArrayList<Player>();
+    Location firstLay;
+
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        timer = 125;
-        newZ = 10;
-
-        Player p = (Player) sender;
-        if (command.getName().equalsIgnoreCase("startGlad")){
-            for (Player ps : Bukkit.getOnlinePlayers()){
-                onlinePlayers.add(ps);
-                ps.teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), -10, 30, newZ));
-            }
-            gameProcess = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                @Override
-                public void run() {
-                    p.sendMessage(String.valueOf(timer));
-                    timer = timer-1;
-
-                    if (timer==120){
-                        int radius  = 5;
-                        for (int x = p.getLocation().getBlockX() - radius ; x <= p.getLocation().getBlockX() + radius ; x++) {
-                            for (int y = p.getLocation().getBlockY() - radius ; y <= p.getLocation().getBlockY() + radius ; y++) {
-                                for (int z = p.getLocation().getBlockZ() - radius ; z <= p.getLocation().getBlockZ() + radius ; z++) {
-                                    Block block = p.getLocation().getWorld().getBlockAt(x, y, z);
-                                    if (block.getType().equals(Material.GLASS)){
-                                        block.setType(Material.AIR);
-                                    }
-                                }
-                            }
-                        }
-                    }else if(timer == 60){
-                        Bukkit.broadcastMessage("КАРА БОГОВ");
-                        punishmentOfGods = Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(plugin, new Runnable() {
-                            @Override
-                            public void run() {
-                                for (Player p : Bukkit.getOnlinePlayers()){
-                                    p.setHealth(p.getHealth()-1);
-                                }
-                            }
-                        },0, 60);
-                    } else if (timer == 0) {
-                        Bukkit.broadcastMessage("КОНЕЦ");
-                        Bukkit.getScheduler().cancelTask(gameProcess);
-                        Bukkit.getScheduler().cancelTask(punishmentOfGods);
-                    }
+        if (command.getName().equalsIgnoreCase("start")){
+            if (!gameIsOn){
+                ((Player) sender).teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), 0, 35, 0));
+                for (Player ps : Bukkit.getOnlinePlayers()){
+                    onlinePlayers.add(ps);
                 }
-            },20,20);
-            int playerAmount = onlinePlayers.size();
+                Location startLoc = new Location(Bukkit.getWorld("GladiatorsWorld"), 10, 35, 10);
 
-            if (playerAmount%4==0){
-                playersInLine = playerAmount/4;
+                for (int i =0; i<=onlinePlayers.size(); i++){
+                    //первый слой игроков
+                    firstLay = startLoc;
+
+                    onlinePlayers.get(i).teleport(firstLay);
+                    firstLay.setZ(startLoc.getBlockZ() -5);
+
+                    if (i%5==0){
+                        firstLay.setX(firstLay.getBlockX()-5);
+                        firstLay.setZ(10);
+                    }
+
+                }
+                gameIsOn = true;
             }else {
-                int remains = playerAmount%4;
-                playersInLine = playerAmount/4;
-                playersInLine = playersInLine+1;
-            }
-
-            for (int i =0; i<=playersInLine; i++){
-
-                onlinePlayers.get(i).teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), -10, 30, newZ));
-                onlinePlayers.get(i+4).teleport(new Location(Bukkit.getWorld("GladiatorsWorld"), 10, 30, newZ));
-                newZ = newZ -5;
-
+                sender.sendMessage("Игра уже идет");
             }
         }
         return true;

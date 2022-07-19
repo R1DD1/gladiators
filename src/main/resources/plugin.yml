@@ -3,4 +3,4 @@ version: '${project.version}'
 main: gladiators.gladiatorsgame.Gladiators
 authors: [ R1DD1 ]
 commands:
-  startGlad:
+  start:
